@@ -1,0 +1,532 @@
+            // 10. Admin Overlay Panel Login & Dashboard Controls
+            const adminOverlay = document.getElementById('admin-overlay');
+            const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
+            const adminCloseBtn = document.getElementById('admin-close-btn');
+            const adminLoginForm = document.getElementById('admin-login-form');
+            const adminLoginCard = document.querySelector('.admin-login-card');
+            const adminDashboardWrapper = document.querySelector('.admin-dashboard-wrapper');
+            const adminLogoutBtn = document.getElementById('admin-logout-btn');
+            
+            // Toggle Admin Panel Open/Close
+            if (adminDashboardBtn) {
+                adminDashboardBtn.addEventListener('click', () => {
+                    adminOverlay.classList.add('open');
+                    // Check if already logged in (simulated session)
+                    if (sessionStorage.getItem('sm_admin_logged_in') === 'true') {
+                        showAdminDashboard();
+                    } else {
+                        showAdminLogin();
+                    }
+                });
+            }
+            
+            if (adminCloseBtn) {
+                adminCloseBtn.addEventListener('click', () => {
+                    adminOverlay.classList.remove('open');
+                });
+            }
+            
+            function showAdminLogin() {
+                adminLoginCard.classList.remove('hidden');
+                adminDashboardWrapper.classList.remove('active');
+            }
+            
+            function showAdminDashboard() {
+                adminLoginCard.classList.add('hidden');
+                adminDashboardWrapper.classList.add('active');
+                
+                // Load contents
+                renderAdminStats();
+                renderAdminInquiries();
+                renderAdminBlogs();
+                renderAdminApprovedBlogs();
+                renderAdminCerts();
+                renderAdminResources();
+            }
+            
+            // Handle admin login
+            if (adminLoginForm) {
+                adminLoginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('admin-email').value.trim();
+                    const password = document.getElementById('admin-password').value.trim();
+                    
+                    if (email === "stenomasterhsr@gmail.com") {
+                        sessionStorage.setItem('sm_admin_logged_in', 'true');
+                        showAdminDashboard();
+                        showToast("Welcome Admin! Access Authorized.");
+                        adminLoginForm.reset();
+                    } else {
+                        showToast("Access Denied: Only stenomasterhsr@gmail.com is authorized.");
+                    }
+                });
+            }
+            
+            if (adminLogoutBtn) {
+                adminLogoutBtn.addEventListener('click', () => {
+                    sessionStorage.removeItem('sm_admin_logged_in');
+                    showAdminLogin();
+                    showToast("Logged out successfully.");
+                });
+            }
+            
+            // Sidebar switching inside admin panel
+            const adminMenuItems = document.querySelectorAll('.admin-menu-item');
+            const adminContentPanes = document.querySelectorAll('.admin-content-pane');
+            
+            adminMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    adminMenuItems.forEach(m => m.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    const targetPane = item.getAttribute('data-admin-tab');
+                    adminContentPanes.forEach(pane => {
+                        pane.classList.remove('active');
+                        if (pane.id === `admin-${targetPane}`) {
+                            pane.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Admin statistics rendering
+            function renderAdminStats() {
+                const inqs = JSON.parse(localStorage.getItem('sm_inquiries')) || [];
+                const certs = JSON.parse(localStorage.getItem('sm_certs')) || [];
+                const blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                
+                document.getElementById('stat-total-inquiries').innerText = inqs.length;
+                document.getElementById('stat-total-certs').innerText = certs.length;
+                
+                // Count pending blogs
+                const pendingBlogs = blogs.filter(b => b.status === 'pending').length;
+                document.getElementById('stat-pending-blogs').innerText = pendingBlogs;
+            }
+        
+            // Admin Inquiries panel rendering + Excel CSV export
+            const exportBtn = document.getElementById('admin-export-inqs');
+            
+            function renderAdminInquiries() {
+                const inqs = JSON.parse(localStorage.getItem('sm_inquiries')) || [];
+                const inqsTableBody = document.getElementById('admin-inqs-table-body');
+                
+                if (!inqsTableBody) return;
+                inqsTableBody.innerHTML = '';
+                
+                if (inqs.length === 0) {
+                    inqsTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No inquiries submitted yet.</td></tr>';
+                    return;
+                }
+                
+                inqs.forEach((inq, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td><strong>${inq.name}</strong></td>
+                        <td>${inq.qualification}</td>
+                        <td>${inq.contact}</td>
+                        <td>${inq.course}</td>
+                        <td>${inq.timestamp}</td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteInquiry('${inq.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    inqsTableBody.appendChild(tr);
+                });
+            }
+            
+            window.deleteInquiry = function(id) {
+                if (!confirm("Are you sure you want to delete this inquiry?")) return;
+                let inqs = JSON.parse(localStorage.getItem('sm_inquiries')) || [];
+                inqs = inqs.filter(i => i.id !== id);
+                localStorage.setItem('sm_inquiries', JSON.stringify(inqs));
+                renderAdminInquiries();
+                renderAdminStats();
+                showToast("Inquiry record deleted.");
+            };
+            
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    const inqs = JSON.parse(localStorage.getItem('sm_inquiries')) || [];
+                    if (inqs.length === 0) {
+                        showToast("No inquiries available to export.");
+                        return;
+                    }
+                    
+                    // Build CSV Content
+                    let csvContent = "data:text/csv;charset=utf-8,";
+                    csvContent += "ID,Full Name,Qualification,Address,Contact Number,Email ID,Father Name,Father Contact,Course,Referral Source,Inquiry Date\n";
+                    
+                    inqs.forEach(inq => {
+                        const row = [
+                            inq.id,
+                            `"${inq.name}"`,
+                            `"${inq.qualification}"`,
+                            `"${inq.address}"`,
+                            `"${inq.contact}"`,
+                            `"${inq.email}"`,
+                            `"${inq.father}"`,
+                            `"${inq.fatherContact}"`,
+                            `"${inq.course}"`,
+                            `"${inq.source}"`,
+                            `"${inq.timestamp}"`
+                        ].join(",");
+                        csvContent += row + "\n";
+                    });
+                    
+                    // Trigger download link
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `STENO_MASTER_inquiries_report_${Date.now()}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast("Excel/CSV Report downloaded successfully!");
+                });
+            }
+        
+            // Admin Blog moderation list (Pending drafts review)
+            function renderAdminBlogs() {
+                const blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                const blogTableBody = document.getElementById('admin-blogs-table-body');
+                
+                if (!blogTableBody) return;
+                blogTableBody.innerHTML = '';
+                
+                const pendingBlogs = blogs.filter(b => b.status === 'pending');
+                
+                if (pendingBlogs.length === 0) {
+                    blogTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No pending drafts to review.</td></tr>';
+                    return;
+                }
+                
+                pendingBlogs.forEach((b, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td><strong>${b.author}</strong></td>
+                        <td>${b.title}</td>
+                        <td><span style="font-size:0.8rem;color:#777;">${b.date}</span></td>
+                        <td>
+                            <button class="action-btn-pill btn-approve" onclick="openBlogPreview('${b.id}')"><i class="fas fa-eye"></i> View Outline</button>
+                        </td>
+                    `;
+                    blogTableBody.appendChild(tr);
+                });
+            }
+        
+            // Render Approved blogs in admin panel for deletion capability
+            function renderAdminApprovedBlogs() {
+                const blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                const approvedTableBody = document.getElementById('admin-approved-blogs-table-body');
+                
+                if (!approvedTableBody) return;
+                approvedTableBody.innerHTML = '';
+                
+                const approvedBlogs = blogs.filter(b => b.status === 'approved');
+                
+                if (approvedBlogs.length === 0) {
+                    approvedTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No published blogs yet.</td></tr>';
+                    return;
+                }
+                
+                approvedBlogs.forEach((b, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td><strong>${b.author}</strong></td>
+                        <td>${b.title}</td>
+                        <td><span style="font-size:0.8rem;color:#777;">${b.date}</span></td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteBlog('${b.id}')"><i class="fas fa-trash"></i> Delete</button>
+                        </td>
+                    `;
+                    approvedTableBody.appendChild(tr);
+                });
+            }
+        
+            // Modal preview outline for blogs
+            window.openBlogPreview = function(id) {
+                const blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                const blog = blogs.find(b => b.id === id);
+                if (!blog) return;
+                
+                document.getElementById('preview-blog-title').innerText = blog.title;
+                document.getElementById('preview-blog-author').innerText = `By: ${blog.author}`;
+                document.getElementById('preview-blog-date').innerText = blog.date;
+                document.getElementById('preview-blog-content').innerText = blog.content;
+                
+                const actionsContainer = document.getElementById('preview-modal-actions');
+                if (actionsContainer) {
+                    actionsContainer.innerHTML = '';
+                    if (blog.status === 'pending') {
+                        actionsContainer.innerHTML = `
+                            <button class="btn btn-primary" style="background-color:#27ae60; border-color:#27ae60; font-size:0.75rem; padding:8px 16px;" onclick="moderateBlog('${blog.id}', 'approve'); closeBlogPreview();"><i class="fas fa-check"></i> Approve & Publish</button>
+                            <button class="btn btn-primary" style="background-color:#c0392b; border-color:#c0392b; font-size:0.75rem; padding:8px 16px;" onclick="moderateBlog('${blog.id}', 'reject'); closeBlogPreview();"><i class="fas fa-times"></i> Reject / Delete</button>
+                        `;
+                    } else {
+                        actionsContainer.innerHTML = `
+                            <button class="btn btn-primary" style="background-color:#c0392b; border-color:#c0392b; font-size:0.75rem; padding:8px 16px;" onclick="deleteBlog('${blog.id}'); closeBlogPreview();"><i class="fas fa-trash"></i> Delete Post</button>
+                            <button class="btn btn-secondary" style="font-size:0.75rem; padding:8px 16px;" onclick="closeBlogPreview()">Close</button>
+                        `;
+                    }
+                }
+                
+                const modal = document.getElementById('blog-preview-modal');
+                if (modal) modal.classList.add('open');
+            };
+        
+            window.closeBlogPreview = function() {
+                const modal = document.getElementById('blog-preview-modal');
+                if (modal) modal.classList.remove('open');
+            };
+        
+            const blogPreviewClose = document.getElementById('blog-preview-close');
+            if (blogPreviewClose) {
+                blogPreviewClose.addEventListener('click', closeBlogPreview);
+            }
+            
+            window.moderateBlog = function(id, action) {
+                const blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                const index = blogs.findIndex(b => b.id === id);
+                
+                if (index !== -1) {
+                    blogs[index].status = action === 'approve' ? 'approved' : 'rejected';
+                    localStorage.setItem('sm_blogs', JSON.stringify(blogs));
+                    
+                    renderAdminBlogs();
+                    renderAdminApprovedBlogs();
+                    renderBlogPosts();
+                    renderAdminStats();
+                    showToast(`Blog post is now ${blogs[index].status}.`);
+                }
+            };
+            
+            window.deleteBlog = function(id) {
+                if (!confirm("Are you sure you want to delete this blog post?")) return;
+                let blogs = JSON.parse(localStorage.getItem('sm_blogs')) || [];
+                blogs = blogs.filter(b => b.id !== id);
+                localStorage.setItem('sm_blogs', JSON.stringify(blogs));
+                
+                renderAdminBlogs();
+                renderAdminApprovedBlogs();
+                renderBlogPosts();
+                renderAdminStats();
+                showToast("Blog post deleted.");
+            };
+        
+            // Admin Certificate lookup list
+            const addCertForm = document.getElementById('admin-add-cert-form');
+            
+            function renderAdminCerts() {
+                const certs = JSON.parse(localStorage.getItem('sm_certs')) || [];
+                const certsTableBody = document.getElementById('admin-certs-table-body');
+                
+                if (!certsTableBody) return;
+                certsTableBody.innerHTML = '';
+                
+                certs.forEach((c, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td><code>${c.id}</code></td>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.course}</td>
+                        <td>
+                            <span style="font-weight:bold;color:${c.status === 'completed' ? '#27ae60':'#d35400'}">${c.status.toUpperCase()}</span>
+                        </td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteCert('${c.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    certsTableBody.appendChild(tr);
+                });
+            }
+            
+            if (addCertForm) {
+                addCertForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('admin-c-id').value.trim().toUpperCase();
+                    const name = document.getElementById('admin-c-name').value.trim();
+                    const course = document.getElementById('admin-c-course').value;
+                    const status = document.getElementById('admin-c-status').value;
+                    
+                    if (!id || !name) {
+                        showToast("Please fill in Student ID and Name.");
+                        return;
+                    }
+                    
+                    const certs = JSON.parse(localStorage.getItem('sm_certs')) || [];
+                    
+                    // Check duplicates
+                    if (certs.some(c => c.id === id)) {
+                        showToast("Error: Student ID already exists.");
+                        return;
+                    }
+                    
+                    certs.push({
+                        id, name, course, status,
+                        date: status === 'completed' ? new Date().toISOString().split('T')[0] : ''
+                    });
+                    
+                    localStorage.setItem('sm_certs', JSON.stringify(certs));
+                    renderAdminCerts();
+                    renderAdminStats();
+                    showToast("Certificate database record created.");
+                    addCertForm.reset();
+                });
+            }
+            
+            window.deleteCert = function(id) {
+                if (!confirm("Delete this certificate record?")) return;
+                let certs = JSON.parse(localStorage.getItem('sm_certs')) || [];
+                certs = certs.filter(c => c.id !== id);
+                localStorage.setItem('sm_certs', JSON.stringify(certs));
+                
+                renderAdminCerts();
+                renderAdminStats();
+                showToast("Certificate deleted.");
+            };
+        
+            // Render Resources list inside Admin dashboard
+            function renderAdminResources() {
+                const res = JSON.parse(localStorage.getItem('sm_resources')) || initialResources;
+                const tbody = document.getElementById('admin-resources-table-body');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                
+                // Render dictations
+                res.dictations.forEach((d, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span style="background-color:rgba(200, 16, 46, 0.1); color:var(--primary-red); font-size:0.7rem; font-weight:700; padding:4px 8px; border-radius:30px;">DICTATION</span></td>
+                        <td><strong>${d.title}</strong></td>
+                        <td>${d.lang}</td>
+                        <td>${d.wpm} WPM</td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteResource('dictations', ${i})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Render strokes
+                res.strokes.forEach((s, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span style="background-color:rgba(52, 152, 219, 0.1); color:#3498db; font-size:0.7rem; font-weight:700; padding:4px 8px; border-radius:30px;">STROKE REFERENCE</span></td>
+                        <td><strong>${s.title}</strong></td>
+                        <td>${s.lang}</td>
+                        <td>PDF</td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteResource('strokes', ${i})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Render tutorials
+                res.tutorials.forEach((t, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span style="background-color:rgba(46, 204, 113, 0.1); color:#2ecc71; font-size:0.7rem; font-weight:700; padding:4px 8px; border-radius:30px;">TUTORIAL VIDEO</span></td>
+                        <td><strong>${t.title}</strong></td>
+                        <td>Both</td>
+                        <td>${t.length}</td>
+                        <td>
+                            <button class="action-btn-pill btn-delete" onclick="deleteResource('tutorials', ${i})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        
+            // Delete a Resource item from catalog
+            window.deleteResource = function(category, index) {
+                if (!confirm("Are you sure you want to delete this resource item?")) return;
+                const res = JSON.parse(localStorage.getItem('sm_resources')) || initialResources;
+                
+                if (res[category]) {
+                    res[category].splice(index, 1);
+                    localStorage.setItem('sm_resources', JSON.stringify(res));
+                    renderAdminResources();
+                    renderResourcesList();
+                    showToast("Resource item deleted from catalog.");
+                }
+            };
+        
+            // Admin Content Upload Forms
+            const addResourceForm = document.getElementById('admin-add-resource-form');
+            const addGalleryForm = document.getElementById('admin-add-gallery-form');
+            
+            if (addResourceForm) {
+                addResourceForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const category = document.getElementById('admin-r-category').value;
+                    const title = document.getElementById('admin-r-title').value.trim();
+                    const lang = document.getElementById('admin-r-lang').value;
+                    const val = document.getElementById('admin-r-val').value.trim();
+                    
+                    if (!title) {
+                        showToast("Resource Title is required.");
+                        return;
+                    }
+                    
+                    const res = JSON.parse(localStorage.getItem('sm_resources')) || initialResources;
+                    
+                    if (category === 'dictation') {
+                        res.dictations.push({
+                            title,
+                            wpm: parseInt(val) || 60,
+                            lang,
+                            file: "#"
+                        });
+                    } else if (category === 'stroke') {
+                        res.strokes.push({
+                            title,
+                            lang,
+                            file: "#"
+                        });
+                    } else {
+                        res.tutorials.push({
+                            title,
+                            type: "video",
+                            length: val || "12:00"
+                        });
+                    }
+                    
+                    localStorage.setItem('sm_resources', JSON.stringify(res));
+                    renderResourcesList();
+                    renderAdminResources();
+                    showToast("New resource file cataloged.");
+                    addResourceForm.reset();
+                });
+            }
+            
+            if (addGalleryForm) {
+                addGalleryForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const category = document.getElementById('admin-g-category').value;
+                    const title = document.getElementById('admin-g-title').value.trim();
+                    const desc = document.getElementById('admin-g-desc').value.trim();
+                    
+                    if (!title || !desc) {
+                        showToast("Title and Description are required.");
+                        return;
+                    }
+                    
+                    const sc = JSON.parse(localStorage.getItem('sm_student_corner')) || initialStudentCorner;
+                    sc[category].push({
+                        title,
+                        desc,
+                        image: ""
+                    });
+                    
+                    localStorage.setItem('sm_student_corner', JSON.stringify(sc));
+                    renderStudentCornerGallery();
+                    showToast("Student Corner media gallery updated.");
+                    addGalleryForm.reset();
+                });
+            }
+        

@@ -1,0 +1,15 @@
+{
+  "name": "steno-master",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/gallery.input.css -o ./css/gallery.css --minify && tailwindcss -i ./css/home.input.css -o ./css/home.css --minify",
+    "test:gallery": "node tests/gallery.cjs",
+    "test:home": "node tests/home.cjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^4.3.3"
+  }
+}
