@@ -53,7 +53,7 @@ const server = http.createServer(async (req,res) => {
     await page.locator(`[data-sub-tab="${category}"]`).click();await fits(category+' '+width);
     assert.equal(await page.locator('.student-sub-pane:visible').count(),1);
    }
-   const styled=await page.locator('[data-sub-tab="blogs"]').evaluate(el=>({height:el.getBoundingClientRect().height,bg:getComputedStyle(el).backgroundColor}));assert.ok(styled.height>=44);assert.equal(styled.bg,'rgb(200, 16, 46)');
+   const styled=await page.locator('[data-sub-tab="blogs"]').evaluate(el=>({height:el.getBoundingClientRect().height,bg:getComputedStyle(el).backgroundColor}));assert.ok(styled.height>=44);assert.equal(styled.bg,'rgb(226, 29, 63)');
    await page.locator('[data-tab="verification"]').click();await fits('certificate '+width);
    await page.locator('#cert-input').fill('SM-2024-001');await page.locator('#cert-input').press('Enter');
    await page.locator('.cert-download-btn').click();assert.equal(await page.locator('#cert-modal').isVisible(),true);

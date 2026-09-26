@@ -1,52 +1,161 @@
 # Steno Master
 
-Rebuild in progress. See [plan.md](plan.md) for the complete audit, architecture, remaining phases and QA requirements.
+Responsive static website for **Steno Master**, a Hindi and English shorthand training institute at Lahoria Chowk, Hisar. The site includes course information, student resources, certificate lookup, enquiry flow, a media gallery and an SEO-focused shorthand blog.
 
-## Current milestone
-The original single-page site's embedded stylesheet and application script have been extracted into `css/main.css` and `js/main.js`. The script is deferred and retains its existing DOMContentLoaded initialization. An exact source snapshot is preserved in `archive/index.original.html.txt` as a non-executable text file.
+## Public pages
 
-This is a transitional extraction, not the completed multi-page or Tailwind implementation. Existing behavior and known limitations remain pending their planned migration.
+- `index.html` — homepage, courses, Student Corner, certificate lookup, about, contact and enquiry
+- `gallery.html` — filterable photo/video gallery with an accessible media viewer
+- `blog/index.html` — shorthand and stenography article directory
+- `blog/english-shorthand-beginners.html` — beginner Pitman shorthand guide
+- `blog/hindi-shorthand-practice.html` — Hindi shorthand speed and accuracy plan
+- `blog/stenographer-exam-preparation.html` — stenographer skill-test strategy
 
-## Run locally
-From this directory run:
+## Technology
 
-```sh
+- Semantic HTML5
+- Compiled Tailwind CSS for the responsive homepage/gallery layers
+- Custom CSS for the long-form blog layout
+- Vanilla JavaScript
+- Browser `localStorage` for demo records
+- Playwright-based responsive checks
+
+No framework or server runtime is required after the CSS is built.
+
+## Local development
+
+Install dependencies:
+
+```bash
+npm ci
+```
+
+Build the Tailwind stylesheets:
+
+```bash
+npm run build:css
+```
+
+Serve the project from its root directory. One option is:
+
+```bash
 python -m http.server 8080 --bind 127.0.0.1
 ```
 
-Then open http://127.0.0.1:8080 in a browser. Use the same origin and port to retain access to existing localStorage records. No packages are needed for this milestone.
+Open `http://127.0.0.1:8080/`. Use an HTTP server instead of opening the HTML files directly so relative URLs, media and browser storage behave consistently.
 
-## Data and integration limitations
-- Enquiries and blog drafts are stored in the current browser and open an email draft; there is no shared backend or delivery confirmation.
-- Certificate records are browser-local. The admin shortcut, UI and authorization logic have been removed from the public homepage; source snippets are preserved under archive/ for the planned separate administration page. No secure backend authentication is implemented.
-- The chatbot uses preset keyword responses. Its launcher/minimize controls now work, and user message text is rendered literally.
-- No real gallery images or resource files were supplied. Existing placeholders are retained for migration.
-- Do not enter sensitive production data into the current prototype.
+## Project structure
+
+```text
+StenoMaster/
+├── assets/
+│   ├── blog/             # Optimized editorial blog images
+│   └── gallery/          # Published gallery media and editing guide
+├── blog/                 # Blog index, articles and article stylesheet
+├── css/
+│   ├── gallery.input.css # Tailwind source for gallery.html
+│   ├── gallery.css       # Generated gallery stylesheet
+│   ├── home.input.css    # Tailwind source for index.html
+│   ├── home.css          # Generated homepage stylesheet
+│   ├── main.css          # Core legacy-compatible components
+│   └── site-nav.css      # Shared navigation treatment
+├── js/                   # Homepage, navigation and gallery scripts/data
+├── tests/                # Responsive browser regression checks
+├── index.html
+├── gallery.html
+├── robots.txt
+└── sitemap.xml
+```
+
+## Brand system
+
+The primary accent is `#E21D3F`, with `#BE123C` for darker hover states. The main typography uses Cinzel for display headings and Outfit for interface/body text. Keep white-on-red controls at accessible contrast and preserve visible keyboard focus styles when changing colors.
+
+After editing either Tailwind input file, run `npm run build:css`; do not hand-edit the generated `home.css` or `gallery.css` output.
+
+## Blog publishing
+
+Each article contains:
+
+- a unique title and meta description;
+- canonical, Open Graph and Twitter metadata;
+- `BlogPosting` and `BreadcrumbList` JSON-LD;
+- a visible publication date matching the structured data;
+- two local, dimensioned and lazy-loaded editorial images;
+- a contents list, useful headings, internal links, FAQs and an enquiry CTA.
+
+The current blog images are original AI-generated illustrations, compressed for web delivery, and are labelled as illustrative in their captions and alt text. They must not be described as photographs of actual Steno Master students or campus events. Replace them with genuine, consented institute photography when available.
+
+When adding an article:
+
+1. Copy an existing article file and give it a descriptive URL slug.
+2. Write a unique title, description, H1 and useful article body.
+3. Add accurate image alt text and fixed `width`/`height` attributes.
+4. Update canonical/OG/Twitter URLs and `BlogPosting` data.
+5. Add the article to `blog/index.html` and `sitemap.xml`.
+6. Validate the JSON-LD with Google's Rich Results Test after deployment.
+
+The `keywords` meta tag is included for completeness and non-Google consumers; useful content, crawlable links, titles, descriptions and structured data remain the primary on-page SEO work.
+
+## SEO configuration
+
+Canonical URLs, social URLs, the sitemap and robots file currently use:
+
+```text
+https://kryzo-mine.github.io/StenoMaster/
+```
+
+This matches the repository's GitHub Pages path. If the site moves to a custom domain, replace this origin in every HTML file, `sitemap.xml` and `robots.txt` before deployment. Keep canonical URLs self-referential and consistent with internal links and the sitemap.
+
+The homepage uses `WebSite` and `EducationalOrganization` structured data. The gallery uses `CollectionPage`; the blog directory uses `Blog`; and article pages use `BlogPosting` plus breadcrumbs. Structured claims are limited to information visible on the site.
+
+## Gallery content
+
+Public gallery entries live in `js/gallery-data.js`. Add genuine media under `assets/gallery/`, then follow `assets/gallery/README.md` for the catalogue format. Do not publish temporary fixtures, generated “campus” images or third-party media without permission.
+
+The gallery supports type/category filters, keyboard navigation, Escape-to-close, touch controls, lazy image loading and native video playback. Videos should include captions when they contain speech.
+
+## Data and functional limitations
+
+This is a static frontend. Enquiries and blog drafts are saved in the visitor's browser and open an email draft; the website cannot confirm delivery. Certificate records are also browser-local and are not an authoritative public verification service.
+
+The chatbot uses preset keyword responses, not an AI service. The public admin shortcut and insecure client-side admin screen were removed. Archived snippets are retained only as reference for a future authenticated backend and must not be published as an admin system.
+
+Do not store sensitive or production-only information in browser storage.
 
 ## Validation
-The extraction was checked by reconstructing the original HTML byte for byte. JavaScript syntax is checked with `node --check js/main.js`. Responsive layouts and browser interactions have not yet been validated. The viewport checklist remains open in `plan.md`.
+
+Build and syntax checks:
+
+```bash
+npm run build:css
+node --check js/main.js
+node --check js/home-ui.js
+node --check js/gallery.js
+```
+
+Responsive browser checks (Google Chrome required):
+
+```bash
+npm run test:home
+npm run test:gallery
+```
+
+The automated suites cover phone, tablet and desktop widths, horizontal overflow, navigation, Student Corner panels, certificate interactions, course scrolling, chatbot safety and gallery viewer controls. Generated screenshots/reports are written to ignored `test-results/`.
 
 ## Deployment
-The eventual build will publish only static production output. Do not publish `archive/` or development documents. This transitional prototype is not production-ready.
 
-## Photo and video gallery
+The deployable static site needs the HTML files plus `assets/`, `blog/`, `css/`, `js/`, `robots.txt` and `sitemap.xml`. Development-only directories such as `node_modules/`, `tests/`, `test-results/`, `archive/` and planning documents should not be included in the published artifact.
 
-Open `gallery.html`. It has its own compiled Tailwind stylesheet and feature scripts; the legacy application is not loaded on this page. The homepage navigation, Student Corner and footer link to it.
+Before launch:
 
-Add genuine media using [assets/gallery/README.md](assets/gallery/README.md). No media was supplied, so the initial public gallery is intentionally empty.
+- confirm the final production origin and update SEO URLs if needed;
+- add genuine gallery media;
+- run both responsive test commands;
+- validate structured data and social-card previews;
+- submit `sitemap.xml` in Google Search Console;
+- connect a real backend before claiming that enquiries, certificates or admin changes are shared across devices.
 
-Install development dependencies with `npm ci`, then run `npm run build:css` after changing gallery classes/styles. The generated `css/gallery.css` is shipped with the site; Node is not needed on the static host. Build setup follows the [Tailwind CLI documentation](https://tailwindcss.com/docs/installation/tailwind-cli).
+## Credits
 
-The gallery canonical/social URLs use `https://example.com` as an explicit placeholder. Replace it with the production origin before publishing.
-
-### Gallery checks
-
-Run `npm run test:gallery` with Google Chrome installed. Tests start their own loopback server, inject temporary media fixtures, exercise all 14 required viewport widths, and write screenshots/results under ignored `test-results/`. The public catalogue stays untouched. Gallery checks passed, including real test-video playback, keyboard/touch controls, no horizontal overflow, and navigation from the homepage. Automated tests use fallback fonts. This does not constitute a complete audit of the remaining legacy site.
-
-## Homepage mobile fixes
-
-`css/home.input.css` contains the compiled Tailwind entry and legacy-layout compatibility rules; `npm run build:css` now builds both public stylesheets. `js/home-ui.js` handles the short intro, accessible mobile menu, chat controls and certificate keyboard interactions.
-
-Run `npm run test:home` (Google Chrome required) for the reported layout and scrolling regressions. The suite covers 320 through 1920px plus 471px, tab switching, Tailwind button styles, certificate lookup/viewer, actual mouse-wheel/touch scrolling and absence of public admin access. External fonts/icons/map are stubbed for deterministic tests.
-
-The admin source snippets are preserved for a future separate page, not linked or loaded by the public site. Exclude the entire archive/ directory when deploying. The public contact email remains the institute contact address, not an exposed admin sign-in identifier.
+Website design and development credit: [Kryzo-Mine](https://github.com/Kryzo-Mine).

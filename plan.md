@@ -3,7 +3,7 @@
 Status: implementation started; full rebuild and responsive QA are not complete.
 
 ## Objective and constraints
-Convert the existing single-file site into a static, mobile-first, accessible multi-page website using HTML5, compiled Tailwind CSS and vanilla JavaScript. Preserve useful content, course details, student resources, stories, certificate lookup, enquiry and local management workflows. Keep #C8102E, #0A0A0A, white, Cinzel and Outfit. Do not invent facts, images, achievements or backend services.
+Convert the existing single-file site into a static, mobile-first, accessible multi-page website using HTML5, compiled Tailwind CSS and vanilla JavaScript. Preserve useful content, course details, student resources, stories, certificate lookup, enquiry and local management workflows. Use the brighter #E21D3F brand red with #0A0A0A, white, Cinzel and Outfit. Do not invent facts, images, achievements or backend services.
 
 ## Audit (25 September 2026)
 The project contains only index.html (approximately 4,786 lines); no build setup, local assets, tests or repository instructions were supplied.
@@ -59,7 +59,7 @@ Target modules: main.js, navigation.js, courses.js, resources.js, gallery.js, bl
 - [ ] Courses: all six variants, eligibility/prerequisites, features and preselected enquiry CTAs.
 - [ ] Resources: preserve catalogue; mark unavailable files honestly.
 - [x] Gallery: dedicated photo/video page, type/category filters, genuine-media catalogue, empty states and accessible viewer. Actual media has not been supplied.
-- [ ] Blogs and existing story page: search/categories, date/excerpt, readable article and appropriate related/navigation states.
+- [x] Blog index and three professional guides: unique metadata, visible dates, structured content, internal links and optimized illustrative imagery.
 - [ ] Enquiry: required name/mobile/email/course/contact preference/message; preserve useful existing fields as appropriate.
 - [ ] Contact: existing address/phone/email/social links/map/hours.
 - [ ] Certificate: validated lookup, loading/result states, viewport-fitting preview and PDF print.
@@ -76,9 +76,9 @@ Target modules: main.js, navigation.js, courses.js, resources.js, gallery.js, bl
 - [ ] Local management migration, safe CSV export and content edits; no imitation Google login or client-side secrets.
 
 ### 7. SEO
-- [ ] Unique title, description, canonical placeholder, H1, Open Graph and social metadata for each page.
-- [ ] EducationalOrganization, breadcrumbs and BlogPosting using supplied facts only.
-- [ ] Production origin configuration, sitemap and robots appropriate to final deployment.
+- [x] Unique title, description, canonical URL, H1, Open Graph and social metadata for each public page.
+- [x] EducationalOrganization, WebSite, Blog, CollectionPage, breadcrumbs and BlogPosting using visible supplied facts only.
+- [x] GitHub Pages origin configuration, sitemap and robots; replace the origin if deployment moves to a custom domain.
 
 ### 8. Accessibility
 - [ ] Keyboard/touch navigation, labels, errors, focus visibility, modal focus containment/return and contrast.
@@ -115,7 +115,7 @@ Actual media/resource files, confirmation of seed certificate/story/achievement 
 - Added photo/video type filters, category filters, lazy image previews, native video playback, error messages, dialog Previous/Next, arrow-key navigation, Escape close and focus restoration. Videos do not autoplay and are removed on close.
 - Reads valid image/video records from existing sm_student_corner storage without changing records; empty placeholder records are not presented as photographs. Local data is still browser-specific.
 - Public media catalogue remains empty because no real media was supplied. Add files and catalogue entries using assets/gallery/README.md. No fake photos or test clips are published.
-- Gallery metadata is provided; example.com canonical/social URLs must be configured before deployment. Other pages still use the legacy architecture.
+- Gallery metadata uses the repository's GitHub Pages origin and must be updated if deployment moves to a custom domain. Other pages still use the legacy architecture.
 
 ### Gallery verification actually performed
 - PASS: npm run build:css; JavaScript syntax checks; local asset/link/fragment existence checks.
@@ -138,3 +138,7 @@ Completed the six screenshot-reported issues:
 - Added compatible responsive layouts for resource cards, forms, contact/about/footer and the chatbot; connected previously unwired chat controls. Text entered in chat is rendered literally.
 
 Validation: npm run build:css; node --check for updated scripts; npm run test:home (148 layout checks at all 14 brief widths plus screenshot width 471px, no page JavaScript exceptions); npm run test:gallery (109 layout/dialog checks, zero console errors). Actual wheel, Shift-scroll overflow and touchscreen swipe checks passed over the course area. Certificate search/Enter/preview/Escape, student tabs, menu, designer link and absence of public admin controls passed. Mobile intro, Student Corner and certificate screenshots visually inspected after fixes. External fonts/icons/map were stubbed in homepage automation; fallback-font layouts were tested. This is scoped remediation, not completion of the full multi-page rebuild or backend work.
+
+## Navigation animation and desktop layout restoration - 26 September 2026
+
+Restored the original interaction sequence documented in archive/index.original.html.txt: the intro types the brand, reveals the tagline, then exits; on desktop the navbar slides down after 200px of scroll, its logo enters from the left and links from the right, and link labels type in once. Section headings reveal letter-by-letter when they enter view. Reduced-motion users skip/disable these transitions. Tablet/mobile keep an immediately available compact menu. Restored original desktop spacing, hero typography, cards and full-width navbar while retaining mobile-first overrides. Added the Home navigation link present in the source.

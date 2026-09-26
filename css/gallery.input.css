@@ -1,36 +1,111 @@
-@import "tailwindcss" source(none);
+﻿@import "tailwindcss" source(none);
 @source "../gallery.html";
 @source "../js/gallery.js";
+
 @theme {
-  --color-brand: #C8102E;
+  --color-brand: #E21D3F;
   --color-ink: #0A0A0A;
   --font-sans: "Outfit", system-ui, sans-serif;
   --font-display: "Cinzel", Georgia, serif;
 }
+
 @layer base {
-  body { overflow-wrap: anywhere; }
-  button, a, select { -webkit-tap-highlight-color: transparent; }
-  button:not(:disabled), select { cursor: pointer; }
-  :focus-visible { outline: 3px solid #C8102E; outline-offset: 4px; }
-  dialog::backdrop { background: rgb(10 10 10 / 85%); }
+  body {
+    overflow-wrap: anywhere;
+  }
+
+  button, a, select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:not(:disabled), select {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid #E21D3F;
+    outline-offset: 4px;
+  }
+
+  dialog::backdrop {
+    background: rgb(10 10 10 / 85%);
+  }
 }
+
 @layer components {
-  .action { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors; }
-  .nav-link { @apply inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-red-50 hover:text-brand; }
-  .filter { @apply min-h-11 rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium transition-colors hover:border-brand; }
-  .filter[aria-pressed="true"] { @apply border-brand bg-brand text-white; }
-  .media-card { @apply flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-sm transition-shadow hover:shadow-lg; }
-  .media-preview { @apply flex aspect-video w-full items-center justify-center bg-zinc-100 text-zinc-600; }
-  .media-image { @apply h-full w-full object-cover; }
-  .media-body { @apply flex w-full min-w-0 flex-1 flex-col gap-2 p-5; }
-  .media-tag { @apply text-xs font-semibold uppercase tracking-widest text-brand; }
-  .media-title { @apply text-lg font-semibold text-ink; }
-  .media-description { @apply text-sm leading-relaxed text-zinc-600; }
-  .media-action { @apply mt-3 text-sm font-semibold text-brand; }
-  #gallery-nav[data-open="true"] { animation: menu-reveal 180ms ease-out; }
-  #media-viewer[open] { animation: menu-reveal 180ms ease-out; }
+  .action {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors;
+  }
+
+  .nav-link {
+    @apply inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-red-50 hover:text-brand;
+  }
+
+  .filter {
+    @apply min-h-11 rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium transition-colors hover:border-brand;
+  }
+
+  .filter[aria-pressed="true"] {
+    @apply border-brand bg-brand text-white;
+  }
+
+  .media-card {
+    @apply flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-sm transition-shadow hover:shadow-lg;
+  }
+
+  .media-preview {
+    @apply flex aspect-video w-full items-center justify-center bg-zinc-100 text-zinc-600;
+  }
+
+  .media-image {
+    @apply h-full w-full object-cover;
+  }
+
+  .media-body {
+    @apply flex w-full min-w-0 flex-1 flex-col gap-2 p-5;
+  }
+
+  .media-tag {
+    @apply text-xs font-semibold uppercase tracking-widest text-brand;
+  }
+
+  .media-title {
+    @apply text-lg font-semibold text-ink;
+  }
+
+  .media-description {
+    @apply text-sm leading-relaxed text-zinc-600;
+  }
+
+  .media-action {
+    @apply mt-3 text-sm font-semibold text-brand;
+  }
+
+  #gallery-nav[data-open="true"] {
+    animation: menu-reveal 180ms ease-out;
+  }
+
+  #media-viewer[open] {
+    animation: menu-reveal 180ms ease-out;
+  }
 }
-@keyframes menu-reveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes menu-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

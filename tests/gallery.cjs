@@ -147,7 +147,11 @@ const server = http.createServer(async (req,res) => {
     const fallback = await noJS.newPage(); await fallback.goto(origin+'/gallery.html');
     assert.equal(await fallback.locator('#gallery-nav').isVisible(),true);
     assert.equal(await fallback.locator('noscript').isVisible(),true);
-    assert.ok(await fallback.evaluate(()=>document.documentElement.scrollWidth<=320));
+    const noJsLayout=await fallback.evaluate(()=>({
+      scrollWidth:document.documentElement.scrollWidth,
+      offenders:[...document.querySelectorAll('body *')].filter(el=>el.getClientRects().length&&el.getBoundingClientRect().right>innerWidth+1).map(el=>({element:el.tagName+'.'+el.className,right:el.getBoundingClientRect().right,width:el.getBoundingClientRect().width})).slice(0,10)
+    }));
+    assert.ok(noJsLayout.scrollWidth<=320,JSON.stringify(noJsLayout));
     await noJS.close();
     const result={status:'passed',widths,overflowAndDialogChecks:checks,consoleErrors:errors,checks:['empty state','mobile menu and Escape','filters and reset','category intersection','safe text rendering','unsafe URL rejection','deduplication','legacy data','corrupt storage fallback','actual video playback','video cleanup','dialog next/previous/arrow keys/Escape/focus return','subpath hosting','no-JS fallback','touch filtering','homepage gallery link']};
     await fs.writeFile(path.join(root,'test-results/gallery-results.json'),JSON.stringify(result,null,2));

@@ -1,0 +1,116 @@
+/* Shared Steno Master navigation language */
+#navbar,
+body > header,
+.site-header {
+  width: calc(100% - 24px);
+  max-width: 1400px;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+  backdrop-filter: blur(10px);
+}
+
+#navbar .navbar-container,
+body > header > div,
+.site-header {
+  padding: 12px 16px;
+}
+
+#navbar .logo-main,
+body > header .brand strong,
+.site-header .brand strong {
+  color: #e21d3f;
+  font-family: Cinzel, Georgia, serif;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+#navbar .logo-sub,
+body > header .brand small,
+.site-header .brand small {
+  color: #626262;
+  letter-spacing: .14em;
+}
+
+#navbar .nav-item,
+body > header .nav-link,
+.site-header .site-nav a {
+  position: relative;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: color .2s ease, background-color .2s ease;
+}
+
+#navbar .nav-item::after,
+body > header .nav-link::after,
+.site-header .site-nav a::after {
+  right: 12px;
+  bottom: 4px;
+  left: 12px;
+  width: auto;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .25s ease;
+}
+
+#navbar .nav-item:hover::after,
+#navbar .nav-item:focus-visible::after,
+#navbar .nav-item.active::after,
+body > header .nav-link:hover::after,
+body > header .nav-link:focus-visible::after,
+body > header .nav-link[aria-current="page"]::after,
+.site-header .site-nav a:hover::after,
+.site-header .site-nav a:focus-visible::after,
+.site-header .site-nav a[aria-current="page"]::after {
+  width: auto;
+  transform: scaleX(1);
+}
+
+#navbar .nav-cta,
+body > header .action,
+.site-header .site-nav .cta {
+  min-height: 40px;
+  padding: 7px 14px !important;
+  border-radius: 999px;
+  background: #e21d3f;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(226, 29, 63, .16);
+}
+
+#navbar .nav-cta::after,
+body > header .action::after,
+.site-header .site-nav .cta::after {
+  display: none;
+}
+
+@media (max-width: 1199px) {
+  #navbar,
+  body > header,
+  .site-header {
+    width: calc(100% - 16px);
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #navbar *,
+  body > header *,
+  .site-header * {
+    transition: none !important;
+  }
+}
+
+/* Index header: inset floating bar, matching the compact desktop reference. */
+@media (min-width: 1200px) {
+  #navbar { top: 12px; left: 50%; width: calc(100% - 24px); max-width: 1400px; border: 1px solid #e0e0e0; border-radius: 14px; transform: translateX(-50%); }
+  #navbar.visible { top: 12px; }
+  #navbar .navbar-container { padding: 12px 16px; }
+}

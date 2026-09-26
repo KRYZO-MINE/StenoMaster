@@ -5,7 +5,9 @@
   "scripts": {
     "build:css": "tailwindcss -i ./css/gallery.input.css -o ./css/gallery.css --minify && tailwindcss -i ./css/home.input.css -o ./css/home.css --minify",
     "test:gallery": "node tests/gallery.cjs",
-    "test:home": "node tests/home.cjs"
+    "test:home": "node tests/home.cjs",
+    "test:seo": "node tests/seo.cjs",
+    "test:blog": "node tests/blog.cjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
